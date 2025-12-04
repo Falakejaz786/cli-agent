@@ -1,224 +1,254 @@
-# 🧠 Project Overview
+# 🧠 StackOverflow Command-Line Support Agent
 
-This project implements an AI-based question answering system trained on real StackOverflow command-line questions. Unlike conventional chatbots that always predict answers using a model, this agent uses a **hybrid approach**:
+A hybrid AI agent that answers command-line related questions using **dataset lookup first** and **LLM generation as fallback**, trained using **LoRA-fine-tuning on GPT-Neo**.
 
-### 🔍 First → Searches the dataset
+This tool behaves like a real IT support assistant:
 
-### 🤖 If not found → Generates answer using LoRA fine-tuned GPT model
-
-This design mimics real-world support systems where verified responses take priority, but AI handles unknown queries.
-
----
-
-# 🔧 Tech Stack Used
-
-### 🚀 Machine Learning & NLP
-
-* **HuggingFace Transformers**
-* **GPT-Neo model**
-* **LoRA (Low Rank Adaptation) fine-tuning**
-* **Datasets library**
-* **Evaluation metrics:**
-
-  * **BLEU score**
-  * **ROUGE-L**
-  * **Exact match accuracy**
-  * **String similarity using difflib**
-
-### 🧠 Model Training
-
-* LoRA adapter training (small learnable weights)
-* Q&A formatting ("Question: X \n Answer:")
-* Batch preprocessing
-* AdamW optimization
-* CPU-compatible fine-tuning
-
-### ⚙ Software & Tools
-
-* Python
-* VS Code
-* Jupyter Notebook
-* JSON Storage
-* Virtual Environment (venv)
+✔ If the answer exists → return verified response
+✔ Otherwise → generate answer using fine-tuned model
 
 ---
 
-# 📊 Evaluation Methodology
+## ⭐ Project Highlights
 
-Evaluation is implemented inside `evaluate.py`.
-The model is tested on samples unseen during training and compared against ground truth answers.
+🚀 Hybrid approach (Search-then-Generate)
+🧠 Fine-tuned GPT-Neo using LoRA (lightweight training)
+🔍 Fast semantic lookup from dataset
+📊 Evaluation performed using BLEU & ROUGE-L
+🖥 CLI interface for real workflow usage
+⚡ Runs locally on CPU
 
-The following metrics are computed:
+This makes it ideal for **training chatbots, internal knowledge systems, developer support bots, and intelligent assistants**.
 
 ---
 
-### 🔹 1. BLEU Score (BiLingual Evaluation Understudy)
+# 📌 Real-World Problem Solved
 
-Measures word-overlap between generated answer and actual answer.
+Organizations repeatedly face the same technical queries:
 
-* Higher score → more accurate, closer to ground-truth
-* Good for short technical answers
+> “How to create a branch?”
+> “How to compress a folder?”
+> “How to install curl on Ubuntu?”
 
-Example:
+Typical workflow today:
+
+🧑‍💻 Engineer Googles / searches past tickets
+⌛ Wastes time
+❌ Inconsistent answers
+
+This project replaces that process with automation:
+
+### 💡 Known → Accurate
+
+### 💬 Unknown → Generated
+
+### 📌 Missing Data → Can be added
+
+This is how real intelligent systems evolve.
+
+---
+
+# 📁 Project Structure
+
+```
+├── stackoverflow_lora.ipynb     # Fine-tuning notebook
+├── agent.py                     # CLI answering agent
+├── evaluate.py                  # Model performance evaluator
+├── commandline_qa.json          # Dataset used for lookup
+├── lora-gptneo/                 # Fine-tuned adapter weights
+└── README.md
+```
+
+---
+
+# 🛠️ Installation & Setup
+
+### 1️⃣ Clone Repo
 
 ```bash
-Generated: "git switch -c branch_name"
-Real: "git checkout -b branch_name"
+git clone <repo-link>
+cd StackoverflowQ&A
 ```
 
-Even though wording differs, BLEU gives similarity credit.
-
 ---
 
-### 🔹 2. ROUGE-L (Recall-Oriented Understudy)
+### 2️⃣ Create Virtual Environment
 
-Measures longest matching sequence of words.
+#### Windows
 
-Useful because:
-✔ commands often have similar structure
-✔ slight variation may still be correct
-
-Example:
-
-```
-tar -czvf file.tar.gz folder/
-tar -czvf folder.tar.gz folder/
+```bash
+python -m venv .venv
+.venv\Scripts\activate
 ```
 
-Model answer is still structurally valid.
+#### Mac/Linux
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
 ---
 
-## 🏆 What Evaluation Shows
+### 3️⃣ Install Dependencies
 
-Models that produce correct structured answers:
-
-⭐ generalize to unseen problems
-⭐ understand patterns
-⭐ respond beyond training data
-
-This validates LoRA fine-tuning effectiveness.
+```bash
+pip install -r requirements.txt
+```
 
 ---
 
-# 🌍 Real-World Impact
+### 4️⃣ Make Sure `lora-gptneo/` Exists
 
-This project solves real engineering problems.
+It must contain:
 
-Here is WHY it matters 👇
-
----
-
-## 💡 1. Automating Technical Support
-
-Companies frequently get repeated technical questions:
-
-❓ "How to delete a branch?"
-❓ "How to schedule cron job?"
-❓ "How to zip folder recursively?"
-
-Call centers & customer helpdesks repeatedly answer them.
-
-➡ This agent instantly produces verified responses
-➡ reducing support cost by ~50-70%
+✔ adapter_model.bin
+✔ adapter_config.json
+✔ tokenizer files
 
 ---
 
-## 🧑‍🎓 2. Personalized Learning Tutor
+# ▶️ Running the Agent
 
-New developers frequently search StackOverflow.
+### Ask a question:
 
-Your agent becomes a:
+```bash
+python agent.py --question "How to create and switch to a new git branch?"
+```
 
-✔ CLI learning assistant
-✔ Linux cheat-sheet
-✔ Troubleshooting guide
+Example output:
 
-Example use case:
+```
+1. git switch -c <branch_name>
+2. (alternative) git checkout -b <branch_name>
+```
 
-> "Why does rm need sudo?"
+### Another example:
 
-It gives contextual explanation.
+```bash
+python agent.py --question "How do I check if a variable is set in Bash?"
+```
 
----
+Output:
 
-## 🏢 3. Onboarding Developers Faster
-
-New employees need knowledge of:
-
-✔ internal scripts
-✔ build commands
-✔ deployment steps
-
-Your dataset logic ensures:
-
-🟢 consistent answers
-🟢 version-controlled knowledge
+```
+if [ -z ${var+x} ]; then echo "var is unset"; else echo "var is set"; fi
+```
 
 ---
 
-## ⚡ 4. Real-Time Knowledge Retrieval
+# 🧠 How It Works Internally
 
-When answer exists → Return instantly
-When missing → AI fills knowledge gap
+### STEP 1: Normalize user query
 
-This hybrid system mimics:
+→ lowercase
+→ remove punctuation
 
-🛜 Confluence Knowledge Base
-🧠 ChatGPT fallback mode
+### STEP 2: Search dataset
 
----
+```
+commandline_qa.json
+```
 
-## 🔍 5. Data Gap Detection (Powerful Insight)
+If exact or fuzzy match found → return verified answer.
 
-When AI generates answer →
-we know dataset lacks that question.
+### STEP 3: If not found → Model inference
 
-This enables:
+* Loads `EleutherAI/gpt-neo-125M`
+* Merges LoRA adapter weights
+* Generates answer
 
-📌 Expanding internal FAQ
-📌 Improving knowledge base
-📌 Auto-learning patterns
+This ensures:
 
-Imagine:
-
-> Each unknown question → stored
-> Human verifies and approves
-> Model retrains → improves continuously
-
-That's how modern AI systems evolve.
+🟢 Correct responses when already known
+🤖 AI-generated fallback when unknown
 
 ---
 
-# 🎯 Why LoRA Makes This Project Practical
+# 📊 Evaluation and Metrics
 
-Without LoRA:
-❌ fine-tuning full model too expensive
-❌ requires GPU clusters
+To evaluate model performance:
 
-With LoRA:
-🔥 trainable on consumer laptop
-🔥 only 1–2% weights updated
-🔥 faster convergence
-🔥 small lightweight adapters
+```bash
+python evaluate.py --adapter lora-gptneo --num 3
+```
 
-This makes real-world deployment feasible.
+And for comparison baseline:
+
+```bash
+python evaluate.py --num 3
 
 ---
 
-# 🧩 What This Project Demonstrates
+# 🌍 Applications
 
-✔ You understand full ML workflow end-to-end:
+### 🏢 1. Internal Developer Support Bot
 
-* dataset creation
-* preprocessing
-* fine-tuning
-* inference pipeline
-* evaluation
-* CLI delivery
+Automates repeated DevOps queries.
 
-✔ You applied research-grade metrics
-✔ You implemented real deployment logic
-✔ You built reproducible tooling
+### 🧑‍🎓 2. Learning Assistant
+
+Beginner asks:
+
+> "How to remove a directory?"
+
+Agent replies:
+
+```
+rm -rf <folder>
+```
+
+### 🚀 3. Onboarding Tool For New Engineers
+
+Interns do not need documentation.
+
+### 🏗 4. Knowledge Base Builder
+
+Unknown query = new dataset entry
+
+Knowledge grows over time.
+
+### 🤖 5. AI-ready Extensions
+
+* FastAPI APIs
+* Slack integration
+* Browser plugins
+* VS Code extension
+
+---
+
+# 🔮 Future Enhancements
+
+✨ Vector-based semantic search
+✨ Auto-update dataset from unknown responses
+✨ Web UI using Streamlit/React
+✨ Full evaluation dashboard
+✨ Logging and versioning
+
+---
+
+# 🙌 Contributions Welcome
+
+Steps to contribute:
+
+```bash
+git checkout -b new-feature
+git commit -m "Improvement"
+git push origin new-feature
+```
+
+---
+
+# 🏁 Final Notes
+
+This project demonstrates:
+
+✔ Data-driven answer retrieval
+✔ Lightweight LoRA fine-tuning
+✔ Real-time inference pipeline
+✔ Proper evaluation metrics
+✔ Fully usable command-line interface
+
+This is a complete real-world ML system—**from training → inference → evaluation → utility**.
 
 ---
